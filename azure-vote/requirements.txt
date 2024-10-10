@@ -1,0 +1,6 @@
+Flask
+opencensus-ext-azure
+opencensus-ext-flask
+redis
+opencensus
+opencensus-ext-logging
