@@ -4,3 +4,4 @@ opencensus-ext-flask
 redis
 opencensus
 opencensus-ext-logging
+logging
