@@ -170,7 +170,7 @@ az vmss extension set \
   --vmss-name $vmssName \
   --name CustomScript \
   --publisher Microsoft.Azure.Extensions \
-  --settings '{"fileUris":["https://github.com/nguyendangthaoit/azure-vote/tree/main/azure-vote/deploy.sh"],"commandToExecute":"bash deploy.sh"}' \
+  --settings '{"fileUris":["https://github.com/nguyendangthaoit/azure-vote/blob/main/azure-vote/deploy.sh"],"commandToExecute":"bash deploy.sh"}' \
   --verbose
 
 echo "Custom script extension applied to VMSS to deploy the Flask app from GitHub."
