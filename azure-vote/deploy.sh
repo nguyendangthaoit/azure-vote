@@ -10,9 +10,9 @@ sudo systemctl start redis-server
 sudo systemctl enable redis-server
 
 # Clone your GitHub repo
-git clone https://github.com/nguyendangthaoit/azure-vote.git /home
+git clone https://github.com/nguyendangthaoit/azure-vote.git /home/azure-vote
 
-# Change directory to your app
+# Change directory to where your app and requirements.txt are located
 cd /home/azure-vote/azure-vote
 
 # Install Flask app dependencies from the repo
