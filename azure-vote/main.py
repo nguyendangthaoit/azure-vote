@@ -39,8 +39,8 @@ logger.addHandler(AzureEventHandler(connection_string=INSTRUMENTATION_KEY))
 stats = stats_module.stats
 view_manager = stats.view_manager
 exporter = new_metrics_exporter(
-enable_standard_metrics=True,
-connection_string=INSTRUMENTATION_KEY)
+    enable_standard_metrics=True,
+    connection_string=INSTRUMENTATION_KEY)
 view_manager.register_exporter(exporter)
 
 # Tracing Configuration
@@ -57,7 +57,23 @@ middleware = FlaskMiddleware(
 )
 
 # Redis Connection
-r = redis.Redis()
+# r = redis.Redis()
+
+# Redis configurations
+redis_server = os.environ['REDIS']
+
+# Redis Connection to another container
+try:
+    if "REDIS_PWD" in os.environ:
+        r = redis.StrictRedis(host=redis_server,
+                              port=6379,
+                              password=os.environ['REDIS_PWD'])
+    else:
+        r = redis.Redis(redis_server, port=6379)
+    r.ping()
+except redis.ConnectionError:
+    exit('Failed to connect to Redis, terminating.')
+
 
 # Load configurations from environment or config file
 app.config.from_pyfile('config_file.cfg')
