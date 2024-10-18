@@ -17,7 +17,10 @@ probeName="tcpProbe"
 vmSize="Standard_B1s"
 storageType="Standard_LRS"
 
-# Create resource group
+# Create resource group. 
+# This command will not work for the Cloud Lab users. 
+# Cloud Lab users can comment this command and 
+# use the existing Resource group name, such as, resourceGroup="cloud-demo-153430" 
 echo "STEP 0 - Creating resource group $resourceGroup..."
 
 az group create \
@@ -48,25 +51,15 @@ az network nsg create \
 
 echo "Network security group created: $nsgName"
 
-# Create Virtual Network and Subnet
-echo "STEP 3 - Creating virtual network $vnetName and subnet $subnetName"
-
-az network vnet create \
-  --resource-group $resourceGroup \
-  --name $vnetName \
-  --subnet-name $subnetName \
-  --verbose
-
-echo "Virtual network and subnet created: $vnetName, $subnetName"
-
 # Create VM Scale Set
-echo "STEP 4 - Creating VM scale set $vmssName"
+echo "STEP 3 - Creating VM scale set $vmssName"
 
 az vmss create \
   --resource-group $resourceGroup \
   --name $vmssName \
   --image $osType \
   --vm-sku $vmSize \
+  --nsg $nsgName \
   --subnet $subnetName \
   --vnet-name $vnetName \
   --backend-pool-name $bePoolName \
@@ -81,7 +74,7 @@ az vmss create \
 echo "VM scale set created: $vmssName"
 
 # Associate NSG with VMSS subnet
-echo "STEP 5 - Associating NSG: $nsgName with subnet: $subnetName"
+echo "STEP 4 - Associating NSG: $nsgName with subnet: $subnetName"
 
 az network vnet subnet update \
 --resource-group $resourceGroup \
@@ -93,7 +86,7 @@ az network vnet subnet update \
 echo "NSG: $nsgName associated with subnet: $subnetName"
 
 # Create Health Probe
-echo "STEP 6 - Creating health probe $probeName"
+echo "STEP 5 - Creating health probe $probeName"
 
 az network lb probe create \
   --resource-group $resourceGroup \
@@ -107,19 +100,8 @@ az network lb probe create \
 
 echo "Health probe created: $probeName"
 
-# Remove existing conflicting load balancer rule if it exists
-echo "STEP 7 - Removing existing conflicting load balancer rule if it exists"
-
-az network lb rule delete \
-  --resource-group $resourceGroup \
-  --lb-name $lbName \
-  --name $lbRule \
-  --verbose
-
-echo "Existing conflicting load balancer rule removed: $lbRule"
-
 # Create Network Load Balancer Rule
-echo "STEP 7 - Creating network load balancer rule $lbRule"
+echo "STEP 6 - Creating network load balancer rule $lbRule"
 
 az network lb rule create \
   --resource-group $resourceGroup \
@@ -135,9 +117,8 @@ az network lb rule create \
 
 echo "Network load balancer rule created: $lbRule"
 
-
 # Add port 80 to inbound rule NSG
-echo "STEP 8 - Adding port 80 to NSG $nsgName"
+echo "STEP 7 - Adding port 80 to NSG $nsgName"
 
 az network nsg rule create \
 --resource-group $resourceGroup \
@@ -151,7 +132,7 @@ az network nsg rule create \
 echo "Port 80 added to NSG: $nsgName"
 
 # Add port 22 to inbound rule NSG
-echo "STEP 9 - Adding port 22 to NSG $nsgName"
+echo "STEP 8 - Adding port 22 to NSG $nsgName"
 
 az network nsg rule create \
 --resource-group $resourceGroup \
@@ -163,17 +144,5 @@ az network nsg rule create \
 --verbose
 
 echo "Port 22 added to NSG: $nsgName"
-
-# Adding Custom Script Extension to deploy the app from GitHub
-az vmss extension set \
-  --resource-group $resourceGroup \
-  --vmss-name $vmssName \
-  --name CustomScript \
-  --publisher Microsoft.Azure.Extensions \
-  --settings '{"fileUris":["https://github.com/nguyendangthaoit/azure-vote/blob/main/azure-vote/deploy.sh"],"commandToExecute":"bash deploy.sh"}' \
-  --verbose
-
-echo "Custom script extension applied to VMSS to deploy the Flask app from GitHub."
-
 
 echo "VMSS script completed!"
