@@ -13,9 +13,10 @@ from opencensus.ext.azure.log_exporter import AzureLogHandler
 from opencensus.ext.azure.trace_exporter import AzureExporter
 from opencensus.trace.tracer import Tracer
 from opencensus.stats import stats as stats_module
+from opencensus.trace.samplers import AlwaysOnSampler
 
 # Application Insights Configuration
-INSTRUMENTATION_KEY = 'InstrumentationKey=3190bc01-3062-4144-80b4-8d759d721b5c;IngestionEndpoint=https://eastus-8.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/;ApplicationId=27808f8a-f2d8-47a8-b2b9-c14721d98e57'
+INSTRUMENTATION_KEY = 'InstrumentationKey=ef6120d4-82eb-49de-8c63-49f1e5fe25fa'
 
 # Initialize Flask App
 app = Flask(__name__)
@@ -42,7 +43,7 @@ exporter = new_metrics_exporter(
     enable_standard_metrics=True,
     connection_string=INSTRUMENTATION_KEY)
 view_manager.register_exporter(exporter)
-
+stats_recorder = stats.stats_recorder
 # Tracing Configuration
 tracer = Tracer(
     exporter=AzureExporter(connection_string=INSTRUMENTATION_KEY),
